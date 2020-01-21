@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Renci.SshNet;
+using System;
 using System.IO;
 using System.Windows.Forms;
 
@@ -15,6 +16,7 @@ namespace AquateknikkUpdater
         private Boolean HasUser = true;
         private int StartAut = 1;
         private int StopAut = 1;
+        private string Filepath = "";
 
         public Form1()
         {
@@ -86,11 +88,11 @@ namespace AquateknikkUpdater
             }
 
 
-            var fileLocation = "";
+            var savefilelocation = "";
             //saveFileDialog1.ShowDialog();
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                fileLocation = saveFileDialog1.FileName;
+                savefilelocation  = saveFileDialog1.FileName;
             }
             else
             {
@@ -100,7 +102,7 @@ namespace AquateknikkUpdater
 
 
             //fileLocation = Got_Flow(fileLocation, 0, flow);
-            File.WriteAllText(fileLocation, flow);
+            File.WriteAllText(savefilelocation, flow);
             lst_log.Items.Add("Current flow is Backed up");
             btnChooseFlow.Enabled = true;
         }
@@ -120,32 +122,40 @@ namespace AquateknikkUpdater
 
         private void button3_Click(object sender, EventArgs e)
         {
+            GetInfo();
             openFileDialog1.ShowDialog();
         }
 
         private void button4_Click(object sender, EventArgs e)
 
         {
+            GetInfo();
             if (Confirmation())
             {
-                string file = File.ReadAllText(txtFile.Text);
-
-                //JObject json = JObject.Parse(file);
-
-                if (Token == null)
-                {
-                    api.Send_Flow(file, "");
-                }
-                else
-                {
-                    api.Send_Flow(file, Token.access_token);
-                }
+                SendFlow();
 
                 lst_log.Items.Add("File Sendt ");
             }
             else
             {
                 lst_log.Items.Add("Canceled");
+            }
+        }
+
+        private void SendFlow()
+        {
+            string file = File.ReadAllText(txtFile.Text);
+
+            //JObject json = JObject.Parse(file);
+            int portnumber = int.Parse(Port);
+            if (Token == null)
+            {
+
+                api.Send_Flow(file, "", IPadress, Port);
+            }
+            else
+            {
+                api.Send_Flow(file, Token.access_token, IPadress, Port);
             }
         }
 
@@ -229,10 +239,13 @@ namespace AquateknikkUpdater
 
         private void btnUpdateAll_Click(object sender, EventArgs e)
         {
+            GetInfo();
             if (Confirmation())
             {
+                string file = File.ReadAllText(Filepath);
                 for (int i = StartAut - 1; i < StopAut; i++)
                 {
+                    SendFlow();
                     lst_log.Items.Add("---Aut Number " + i + " updated");
                 }
                 lst_log.Items.Add("All updated");
@@ -258,6 +271,37 @@ namespace AquateknikkUpdater
             else
             {
                 return false;
+            }
+        }
+
+        private void btnsql_Click(object sender, EventArgs e)
+        {
+            string host = @"192.168.250.5";
+            string username = "pi";
+            string password = "kalinka17";
+            string localFileName = System.IO.Path.GetFileName(@"localfilename");
+            string remoteDirectory = "/home/pi/";
+
+
+            using (var sshclient = new SshClient(host, username, password))
+            {
+                sshclient.Connect();
+                SshCommand sc = sshclient.CreateCommand("mysqldump -u root -pkalinka17 fishfarm > fishfarmbackup.sql");
+                sc.Execute();
+                string answer = sc.Result;
+                
+
+            }
+
+
+            using (var sftp = new SftpClient(host, username, password))
+            {
+                sftp.Connect();
+                var files = sftp.ListDirectory(remoteDirectory);
+                using (Stream fileStream = File.Create(@"C:\Users\oivind.heggland\OneDrive - Bouvet Norge AS\Desktop\fishfarmbackup.sql"))
+                {
+                    sftp.DownloadFile("/home/pi/fishfarmbackup.sql", fileStream);
+                }
             }
         }
     }

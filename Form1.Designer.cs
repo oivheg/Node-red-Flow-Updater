@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.btnTestConn = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnBackup = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.btnChooseFlow = new System.Windows.Forms.Button();
             this.txtFile = new System.Windows.Forms.TextBox();
@@ -57,6 +57,7 @@
             this.lblpass = new System.Windows.Forms.Label();
             this.chckNoUser = new System.Windows.Forms.CheckBox();
             this.btnUpdateAll = new System.Windows.Forms.Button();
+            this.btnsql = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnTestConn
@@ -69,15 +70,15 @@
             this.btnTestConn.UseVisualStyleBackColor = true;
             this.btnTestConn.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
+            // btnBackup
             // 
-            this.button2.Location = new System.Drawing.Point(50, 274);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(152, 20);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Backup Current flow";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnBackup.Location = new System.Drawing.Point(50, 274);
+            this.btnBackup.Name = "btnBackup";
+            this.btnBackup.Size = new System.Drawing.Size(152, 20);
+            this.btnBackup.TabIndex = 1;
+            this.btnBackup.Text = "Backup Current flow";
+            this.btnBackup.UseVisualStyleBackColor = true;
+            this.btnBackup.Click += new System.EventHandler(this.button2_Click);
             // 
             // openFileDialog1
             // 
@@ -299,11 +300,22 @@
             this.btnUpdateAll.UseVisualStyleBackColor = true;
             this.btnUpdateAll.Click += new System.EventHandler(this.btnUpdateAll_Click);
             // 
+            // btnsql
+            // 
+            this.btnsql.Location = new System.Drawing.Point(419, 39);
+            this.btnsql.Name = "btnsql";
+            this.btnsql.Size = new System.Drawing.Size(75, 23);
+            this.btnsql.TabIndex = 27;
+            this.btnsql.Text = "Backup SQL";
+            this.btnsql.UseVisualStyleBackColor = true;
+            this.btnsql.Click += new System.EventHandler(this.btnsql_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnsql);
             this.Controls.Add(this.btnUpdateAll);
             this.Controls.Add(this.chckNoUser);
             this.Controls.Add(this.lblpass);
@@ -328,7 +340,7 @@
             this.Controls.Add(this.btnSendFile);
             this.Controls.Add(this.txtFile);
             this.Controls.Add(this.btnChooseFlow);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnBackup);
             this.Controls.Add(this.btnTestConn);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -341,7 +353,7 @@
         #endregion
 
         private System.Windows.Forms.Button btnTestConn;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnBackup;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button btnChooseFlow;
         private System.Windows.Forms.TextBox txtFile;
@@ -369,6 +381,7 @@
         private System.Windows.Forms.Label lblpass;
         private System.Windows.Forms.CheckBox chckNoUser;
         private System.Windows.Forms.Button btnUpdateAll;
+        private System.Windows.Forms.Button btnsql;
     }
 }
 

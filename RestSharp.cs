@@ -88,9 +88,9 @@ namespace AquateknikkUpdater
             return Flow;
         }
 
-        public void Send_Flow(string file, string token)
+        public void Send_Flow(string file, string token, string ipAdress, string port)
         {
-            var restClient = new RestClient("http://localhost:1880");
+            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
 
             if (token != null)
             {
@@ -108,7 +108,11 @@ namespace AquateknikkUpdater
             {
                 Console.WriteLine("File not Sendt ");
             }
-            Console.WriteLine("File  Sendt ");
+            else
+            {
+Console.WriteLine("File  Sendt ");
+            }
+            
         }
     }
 }
