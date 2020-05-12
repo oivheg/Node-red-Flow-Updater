@@ -92,7 +92,7 @@ namespace AquateknikkUpdater
         {
             var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
 
-            if (token != null)
+            if ( !string.IsNullOrEmpty(token) )
             {
                 restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
             }

@@ -62,7 +62,7 @@
             // 
             // btnTestConn
             // 
-            this.btnTestConn.Location = new System.Drawing.Point(216, 59);
+            this.btnTestConn.Location = new System.Drawing.Point(219, 17);
             this.btnTestConn.Name = "btnTestConn";
             this.btnTestConn.Size = new System.Drawing.Size(115, 38);
             this.btnTestConn.TabIndex = 0;
@@ -150,9 +150,9 @@
             this.lblIp.AutoSize = true;
             this.lblIp.Location = new System.Drawing.Point(15, 58);
             this.lblIp.Name = "lblIp";
-            this.lblIp.Size = new System.Drawing.Size(50, 13);
+            this.lblIp.Size = new System.Drawing.Size(114, 13);
             this.lblIp.TabIndex = 9;
-            this.lblIp.Text = "Ip adress";
+            this.lblIp.Text = "Base/Master Ip adress";
             // 
             // txtPort
             // 
@@ -164,7 +164,7 @@
             // lblport
             // 
             this.lblport.AutoSize = true;
-            this.lblport.Location = new System.Drawing.Point(118, 58);
+            this.lblport.Location = new System.Drawing.Point(148, 58);
             this.lblport.Name = "lblport";
             this.lblport.Size = new System.Drawing.Size(26, 13);
             this.lblport.TabIndex = 11;
@@ -173,7 +173,7 @@
             // lblToAuth
             // 
             this.lblToAuth.AutoSize = true;
-            this.lblToAuth.Location = new System.Drawing.Point(433, 137);
+            this.lblToAuth.Location = new System.Drawing.Point(432, 85);
             this.lblToAuth.Name = "lblToAuth";
             this.lblToAuth.Size = new System.Drawing.Size(50, 13);
             this.lblToAuth.TabIndex = 15;
@@ -181,15 +181,15 @@
             // 
             // txtportstop
             // 
-            this.txtportstop.Location = new System.Drawing.Point(419, 156);
+            this.txtportstop.Location = new System.Drawing.Point(418, 104);
             this.txtportstop.Name = "txtportstop";
-            this.txtportstop.Size = new System.Drawing.Size(66, 20);
+            this.txtportstop.Size = new System.Drawing.Size(94, 20);
             this.txtportstop.TabIndex = 14;
             // 
             // lblFromAut
             // 
             this.lblFromAut.AutoSize = true;
-            this.lblFromAut.Location = new System.Drawing.Point(353, 137);
+            this.lblFromAut.Location = new System.Drawing.Point(352, 85);
             this.lblFromAut.Name = "lblFromAut";
             this.lblFromAut.Size = new System.Drawing.Size(60, 13);
             this.lblFromAut.TabIndex = 13;
@@ -197,14 +197,14 @@
             // 
             // txtportstart
             // 
-            this.txtportstart.Location = new System.Drawing.Point(352, 156);
+            this.txtportstart.Location = new System.Drawing.Point(342, 104);
             this.txtportstart.Name = "txtportstart";
-            this.txtportstart.Size = new System.Drawing.Size(61, 20);
+            this.txtportstart.Size = new System.Drawing.Size(70, 20);
             this.txtportstart.TabIndex = 12;
             // 
             // btnBackupFolder
             // 
-            this.btnBackupFolder.Location = new System.Drawing.Point(343, 185);
+            this.btnBackupFolder.Location = new System.Drawing.Point(342, 133);
             this.btnBackupFolder.Name = "btnBackupFolder";
             this.btnBackupFolder.Size = new System.Drawing.Size(152, 20);
             this.btnBackupFolder.TabIndex = 16;
@@ -224,7 +224,7 @@
             // lblMultiple
             // 
             this.lblMultiple.AutoSize = true;
-            this.lblMultiple.Location = new System.Drawing.Point(362, 118);
+            this.lblMultiple.Location = new System.Drawing.Point(361, 66);
             this.lblMultiple.Name = "lblMultiple";
             this.lblMultiple.Size = new System.Drawing.Size(105, 13);
             this.lblMultiple.TabIndex = 18;
@@ -302,7 +302,7 @@
             // 
             // btnsql
             // 
-            this.btnsql.Location = new System.Drawing.Point(419, 39);
+            this.btnsql.Location = new System.Drawing.Point(461, 12);
             this.btnsql.Name = "btnsql";
             this.btnsql.Size = new System.Drawing.Size(75, 23);
             this.btnsql.TabIndex = 27;

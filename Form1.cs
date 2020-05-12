@@ -9,7 +9,7 @@ namespace AquateknikkUpdater
     {
         private Token Token;
         private readonly RestSharp api = new RestSharp();
-        private string IPadress = "";
+        private string IPadress = "1.2.3.4";
         private string Port = "";
         private string User = "";
         private string Pass = "";
@@ -17,10 +17,18 @@ namespace AquateknikkUpdater
         private int StartAut = 1;
         private int StopAut = 1;
         private string Filepath = "";
-
+      private string  fileLocation = "";
         public Form1()
         {
             InitializeComponent();
+
+            #region debugging
+
+            btnChooseFlow.Enabled = true;
+            btnSendFile.Enabled = true;
+            btnUpdateAll.Enabled = true;
+
+            #endregion debugging
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -29,31 +37,23 @@ namespace AquateknikkUpdater
 
             GetInfo();
             var Login = api.CheckConnection(IPadress, Port);
-           // Token = api.Authenticate(IPadress, Port, User, Pass);
+            // Token = api.Authenticate(IPadress, Port, User, Pass);
 
             if (Login == "1")
             {
                 messageBox("Login is required", "login");
             }
-            else  if (Login == "2")
+            else if (Login == "2")
             {
                 messageBox("No Login required", "NO login");
                 chckNoUser.Checked = true;
                 txtuser.Enabled = false;
                 txtpass.Enabled = false;
-            }else if (Login == "-1")
+            }
+            else if (Login == "-1")
             {
                 messageBox("Check IP", "No Conenction");
             }
-            //if (HasUser != true)
-            //{
-            //    Token = api.Authenticate(IPadress, Port, User, Pass);
-            //    lst_log.Items.Add("Token Received");
-            //}
-            //else
-            //{
-            //    lst_log.Items.Add("No User: No Token");
-            //}
         }
 
         private static void messageBox(string Message, string Title)
@@ -71,6 +71,10 @@ namespace AquateknikkUpdater
             User = txtuser.Text;
             Pass = txtpass.Text;
             HasUser = chckNoUser.Checked;
+
+            int portnumber = int.Parse(Port);
+         
+            Token = api.Authenticate(IPadress, portnumber.ToString(), User, Pass);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -87,12 +91,12 @@ namespace AquateknikkUpdater
                 flow = api.Get_Flows(Token.access_token, IPadress, Port);
             }
 
-
             var savefilelocation = "";
+           
             //saveFileDialog1.ShowDialog();
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                savefilelocation  = saveFileDialog1.FileName;
+                savefilelocation = saveFileDialog1.FileName;
             }
             else
             {
@@ -101,6 +105,7 @@ namespace AquateknikkUpdater
             }
 
 
+            fileLocation = System.IO.Path.GetDirectoryName(savefilelocation);
             //fileLocation = Got_Flow(fileLocation, 0, flow);
             File.WriteAllText(savefilelocation, flow);
             lst_log.Items.Add("Current flow is Backed up");
@@ -111,9 +116,9 @@ namespace AquateknikkUpdater
         {
             var tmp = (System.Windows.Forms.OpenFileDialog)sender;
 
-            var filpath = tmp.FileName;
+            Filepath = tmp.FileName;
 
-            txtFile.Text = filpath;
+            txtFile.Text = Filepath;
             lst_log.Items.Add("File added");
 
             btnSendFile.Enabled = true;
@@ -122,6 +127,7 @@ namespace AquateknikkUpdater
 
         private void button3_Click(object sender, EventArgs e)
         {
+
             GetInfo();
             openFileDialog1.ShowDialog();
         }
@@ -132,7 +138,7 @@ namespace AquateknikkUpdater
             GetInfo();
             if (Confirmation())
             {
-                SendFlow();
+                SendFlow(IPadress);
 
                 lst_log.Items.Add("File Sendt ");
             }
@@ -142,7 +148,7 @@ namespace AquateknikkUpdater
             }
         }
 
-        private void SendFlow()
+        private void SendFlow(string autIp)
         {
             string file = File.ReadAllText(txtFile.Text);
 
@@ -150,8 +156,7 @@ namespace AquateknikkUpdater
             int portnumber = int.Parse(Port);
             if (Token == null)
             {
-
-                api.Send_Flow(file, "", IPadress, Port);
+                api.Send_Flow(file, "", autIp, Port);
             }
             else
             {
@@ -161,15 +166,15 @@ namespace AquateknikkUpdater
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            txtIp.Text = "192.168.250.5";
+            txtIp.Text = "192.168.100.220";
             txtPort.Text = "1880";
 
-            btnChooseFlow.Enabled = false;
+            //btnChooseFlow.Enabled = false;
         }
-
+ 
         private void btnBackupFolder_Click(object sender, EventArgs e)
         {
-            var fileLocation = "";
+          
             //saveFileDialog1.ShowDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -223,6 +228,8 @@ namespace AquateknikkUpdater
             //return fileLocation;
         }
 
+        private int autnr = 50;
+
         private void chckNoUser_CheckedChanged(object sender, EventArgs e)
         {
             if (chckNoUser.Checked == true)
@@ -239,13 +246,16 @@ namespace AquateknikkUpdater
 
         private void btnUpdateAll_Click(object sender, EventArgs e)
         {
+            StopAut = int.Parse(txtportstop.Text);
             GetInfo();
             if (Confirmation())
             {
                 string file = File.ReadAllText(Filepath);
                 for (int i = StartAut - 1; i < StopAut; i++)
                 {
-                    SendFlow();
+                    var tmpIPadress = IPadress + (autnr + i);
+                    SendFlow(tmpIPadress);
+
                     lst_log.Items.Add("---Aut Number " + i + " updated");
                 }
                 lst_log.Items.Add("All updated");
@@ -276,33 +286,46 @@ namespace AquateknikkUpdater
 
         private void btnsql_Click(object sender, EventArgs e)
         {
-            string host = @"192.168.250.5";
+            BackupSql();
+        }
+
+        private void BackupSql()
+        {
+            string host = @"" + IPadress;
+            //string host = @"192.168.250.5";
+            //string username = "pi";
+            //string password = "kalinka17";
             string username = "pi";
             string password = "kalinka17";
             string localFileName = System.IO.Path.GetFileName(@"localfilename");
             string remoteDirectory = "/home/pi/";
 
-
             using (var sshclient = new SshClient(host, username, password))
             {
                 sshclient.Connect();
+                SshCommand sc1 = sshclient.CreateCommand("ssh pi@192.168.250.220");
+                sc1.Execute();
+                SshCommand sc2 = sshclient.CreateCommand(password);
+                sc2.Execute();
+                string sshanswere = sc1.Result;
+                string loginanswere = sc2.Result;
+
                 SshCommand sc = sshclient.CreateCommand("mysqldump -u root -pkalinka17 fishfarm > fishfarmbackup.sql");
                 sc.Execute();
                 string answer = sc.Result;
-                
-
             }
-
 
             using (var sftp = new SftpClient(host, username, password))
             {
                 sftp.Connect();
                 var files = sftp.ListDirectory(remoteDirectory);
-                using (Stream fileStream = File.Create(@"C:\Users\oivind.heggland\OneDrive - Bouvet Norge AS\Desktop\fishfarmbackup.sql"))
+                using (Stream fileStream = File.Create(fileLocation + "\\" + txtplant.Text + "DB.sql"))
                 {
                     sftp.DownloadFile("/home/pi/fishfarmbackup.sql", fileStream);
                 }
             }
+
+            lst_log.Items.Add("SQL Database backed up");
         }
     }
 }
