@@ -6,113 +6,111 @@ using System.Web.Script.Serialization;
 
 namespace AquateknikkUpdater
 {
-    internal class RestSharp
-    {
+	internal class RestSharp
+	{
+		public string CheckConnection(string ipAdress, string port)
+		{
+			var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
+			//restClient.Timeout = 100;
+			var restRequest = new RestRequest("/auth/login", Method.Get);
 
-        public string CheckConnection(string ipAdress, string port)
-        {
+			RestResponse response = restClient.Execute(restRequest);
 
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
-            //restClient.Timeout = 100;
-            var restRequest = new RestRequest("/auth/login", Method.GET);
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine("Access Token cannot obtain, process terminate");
+				return "-1";
+			}
+			var ser = new JavaScriptSerializer();
+			dynamic redresult = ser.Deserialize<dynamic>(response.Content);
 
-            IRestResponse response = restClient.Execute(restRequest);
+			if (redresult.Count == 0)
+			{
+				return "2";
+			}
+			string name = redresult["type"];
+			return "1";
+		}
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                Console.WriteLine("Access Token cannot obtain, process terminate");
-                return "-1";
-            }
-            var ser = new JavaScriptSerializer();
-            dynamic redresult = ser.Deserialize<dynamic>(response.Content);
-            
-            if (redresult.Count == 0)
-            {
-                return "2";
-            }
-            string name = redresult["type"];
-            return "1";
-        }
-        public Token Authenticate(string ipAdress, string port, string user, string pass)
-        {
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
+		public Token Authenticate(string ipAdress, string port, string user, string pass)
+		{
+			var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
 
-            var restRequest = new RestRequest("/auth/token", Method.POST);
+			var restRequest = new RestRequest("/auth/token", Method.Post);
 
-            //restRequest.AddXmlBody("client_id", "node-red-editor");
-            //restRequest.AddXmlBody("grant_type", "password");
-            //restRequest.AddXmlBody("scope", "*");
-            //restRequest.AddXmlBody("username", "admin");
-            //restRequest.AddXmlBody("password", "kalinka17");
-            //restRequest.AddHeader("content-type", "application/x-www-form-urlencoded");
+			//restRequest.AddXmlBody("client_id", "node-red-editor");
+			//restRequest.AddXmlBody("grant_type", "password");
+			//restRequest.AddXmlBody("scope", "*");
+			//restRequest.AddXmlBody("username", "admin");
+			//restRequest.AddXmlBody("password", "kalinka17");
+			//restRequest.AddHeader("content-type", "application/x-www-form-urlencoded");
 
-            restRequest.AddParameter("application/x-www-form-urlencoded", $"client_id=node-red-editor&grant_type=password" + $"&scope=*" + $"&username=" + user + "" + $"&password=" + pass + "", ParameterType.RequestBody);
+			restRequest.AddParameter("application/x-www-form-urlencoded", $"client_id=node-red-editor&grant_type=password" + $"&scope=*" + $"&username=" + user + "" + $"&password=" + pass + "", ParameterType.RequestBody);
 
-            //var response = restClient.Post(restRequest);
+			//var response = restClient.Post(restRequest);
 
-            IRestResponse response = restClient.Execute(restRequest);
+			RestResponse response = restClient.Execute(restRequest);
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                Console.WriteLine("Access Token cannot obtain, process terminate");
-                return null;
-            }
-            Console.WriteLine("Access Token  obtained");
-            var tokenResponse = (response.Content);
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine("Access Token cannot obtain, process terminate");
+				return null;
+			}
+			Console.WriteLine("Access Token  obtained");
+			var tokenResponse = (response.Content);
 
-            var Token = JsonConvert.DeserializeObject<Token>(tokenResponse);
-            return Token;
-        }
+			var Token = JsonConvert.DeserializeObject<Token>(tokenResponse);
+			return Token;
+		}
 
-        public string Get_Flows(string token, string ipAdress, string port)
-        {
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
+		public string Get_Flows(string token, string ipAdress, string port)
+		{
+			var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
 
-            if (token != null)
-            {
-                restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
-            }
+			if (token != null)
+			{
+				restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
+			}
 
-            var restRequest = new RestRequest("/flows", Method.GET);
+			var restRequest = new RestRequest("/flows", Method.Get);
 
-            IRestResponse response = restClient.Execute(restRequest);
+			RestResponse response = restClient.Execute(restRequest);
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                Console.WriteLine("Flow not found");
-                return null;
-            }
-            Console.WriteLine("Flow  found");
-            var Flow = (response.Content);
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine("Flow not found");
+				return null;
+			}
+			Console.WriteLine("Flow  found");
+			var Flow = (response.Content);
 
-            return Flow;
-        }
+			return Flow;
+		}
 
-        public void Send_Flow(string file, string token, string ipAdress, string port)
-        {
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
+		public void Send_Flow(string file, string token, string ipAdress, string port)
+		{
+			var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
 
-            if ( !string.IsNullOrEmpty(token) )
-            {
-                restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
-            }
+			if (!string.IsNullOrEmpty(token))
+			{
+				restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
+			}
 
-            var restRequest = new RestRequest("/flows", Method.POST);
+			var restRequest = new RestRequest("/flows", Method.Post);
 
-            //restRequest.AddFile("filename", fileName);
-            restRequest.AddParameter("application/json", file, ParameterType.RequestBody);
-            //restRequest.AddParameter("content-type", "application/json");
-            IRestResponse response = restClient.Execute(restRequest);
+			//restRequest.AddFile("filename", fileName);
+			restRequest.AddParameter("application/json", file, ParameterType.RequestBody);
+			//restRequest.AddParameter("content-type", "application/json");
+			RestResponse response = restClient.Execute(restRequest);
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                Console.WriteLine("File not Sendt ");
-            }
-            else
-            {
-Console.WriteLine("File  Sendt ");
-            }
-            
-        }
-    }
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine("File not Sendt ");
+			}
+			else
+			{
+				Console.WriteLine("File  Sendt ");
+			}
+		}
+	}
 }

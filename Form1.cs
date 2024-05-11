@@ -17,7 +17,8 @@ namespace AquateknikkUpdater
         private int StartAut = 1;
         private int StopAut = 1;
         private string Filepath = "";
-      private string  fileLocation = "";
+        private string fileLocation = "";
+
         public Form1()
         {
             InitializeComponent();
@@ -73,7 +74,7 @@ namespace AquateknikkUpdater
             HasUser = chckNoUser.Checked;
 
             int portnumber = int.Parse(Port);
-         
+
             Token = api.Authenticate(IPadress, portnumber.ToString(), User, Pass);
         }
 
@@ -92,7 +93,7 @@ namespace AquateknikkUpdater
             }
 
             var savefilelocation = "";
-           
+
             //saveFileDialog1.ShowDialog();
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -103,7 +104,6 @@ namespace AquateknikkUpdater
                 lst_log.Items.Add("Canceled: Current flow not backed up");
                 return;
             }
-
 
             fileLocation = System.IO.Path.GetDirectoryName(savefilelocation);
             //fileLocation = Got_Flow(fileLocation, 0, flow);
@@ -127,7 +127,6 @@ namespace AquateknikkUpdater
 
         private void button3_Click(object sender, EventArgs e)
         {
-
             GetInfo();
             openFileDialog1.ShowDialog();
         }
@@ -154,13 +153,14 @@ namespace AquateknikkUpdater
 
             //JObject json = JObject.Parse(file);
             int portnumber = int.Parse(Port);
+            Token = api.Authenticate(autIp, Port, User, Pass);
             if (Token == null)
             {
                 api.Send_Flow(file, "", autIp, Port);
             }
             else
             {
-                api.Send_Flow(file, Token.access_token, IPadress, Port);
+                api.Send_Flow(file, Token.access_token, autIp, Port);
             }
         }
 
@@ -171,10 +171,9 @@ namespace AquateknikkUpdater
 
             //btnChooseFlow.Enabled = false;
         }
- 
+
         private void btnBackupFolder_Click(object sender, EventArgs e)
         {
-          
             //saveFileDialog1.ShowDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
