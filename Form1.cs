@@ -81,7 +81,7 @@ namespace AquateknikkUpdater
         {
             var flow = "";
             GetInfo();
-            Token = api.Authenticate(IPadress, Port, User, Pass);
+         
             if (Token == null)
             {
                 flow = api.Get_Flows("", IPadress, Port);
@@ -154,13 +154,14 @@ namespace AquateknikkUpdater
 
             //JObject json = JObject.Parse(file);
             int portnumber = int.Parse(Port);
+            Token = api.Authenticate(autIp, portnumber.ToString(), User, Pass);
             if (Token == null)
             {
                 api.Send_Flow(file, "", autIp, Port);
             }
             else
             {
-                api.Send_Flow(file, Token.access_token, IPadress, Port);
+                api.Send_Flow(file, Token.access_token, autIp, Port);
             }
         }
 
@@ -247,6 +248,8 @@ namespace AquateknikkUpdater
         private void btnUpdateAll_Click(object sender, EventArgs e)
         {
             StopAut = int.Parse(txtportstop.Text);
+            StartAut = int.Parse(txtportstart.Text);
+
             GetInfo();
             if (Confirmation())
             {
@@ -254,6 +257,7 @@ namespace AquateknikkUpdater
                 for (int i = StartAut - 1; i < StopAut; i++)
                 {
                     var tmpIPadress = IPadress + (autnr + i);
+                 
                     SendFlow(tmpIPadress);
 
                     lst_log.Items.Add("---Aut Number " + i + " updated");

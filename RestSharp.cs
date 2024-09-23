@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using RestSharp;
+﻿using RestSharp;
 using System;
 using System.Net;
-using System.Web.Script.Serialization;
+using System.Text.Json;
+
 
 namespace AquateknikkUpdater
 {
@@ -14,30 +14,30 @@ namespace AquateknikkUpdater
 
             var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
             //restClient.Timeout = 100;
-            var restRequest = new RestRequest("/auth/login", Method.GET);
+            var restRequest = new RestRequest("/auth/login", Method.Get);
 
-            IRestResponse response = restClient.Execute(restRequest);
+            RestResponse response = restClient.Execute(restRequest);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Console.WriteLine("Access Token cannot obtain, process terminate");
                 return "-1";
             }
-            var ser = new JavaScriptSerializer();
-            dynamic redresult = ser.Deserialize<dynamic>(response.Content);
-            
-            if (redresult.Count == 0)
+
+            dynamic redresult = JsonSerializer.Deserialize<dynamic>(response.Content);
+
+            if ((redresult.ValueKind == JsonValueKind.Object))
             {
                 return "2";
             }
-            string name = redresult["type"];
+            
             return "1";
         }
         public Token Authenticate(string ipAdress, string port, string user, string pass)
         {
             var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
 
-            var restRequest = new RestRequest("/auth/token", Method.POST);
+            var restRequest = new RestRequest("/auth/token", Method.Post);
 
             //restRequest.AddXmlBody("client_id", "node-red-editor");
             //restRequest.AddXmlBody("grant_type", "password");
@@ -50,7 +50,7 @@ namespace AquateknikkUpdater
 
             //var response = restClient.Post(restRequest);
 
-            IRestResponse response = restClient.Execute(restRequest);
+            RestResponse response = restClient.Execute(restRequest);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -60,7 +60,7 @@ namespace AquateknikkUpdater
             Console.WriteLine("Access Token  obtained");
             var tokenResponse = (response.Content);
 
-            var Token = JsonConvert.DeserializeObject<Token>(tokenResponse);
+            var Token = JsonSerializer.Deserialize<Token>(tokenResponse);
             return Token;
         }
 
@@ -73,9 +73,9 @@ namespace AquateknikkUpdater
                 restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
             }
 
-            var restRequest = new RestRequest("/flows", Method.GET);
+            var restRequest = new RestRequest("/flows", Method.Get);
 
-            IRestResponse response = restClient.Execute(restRequest);
+            RestResponse response = restClient.Execute(restRequest);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -97,12 +97,12 @@ namespace AquateknikkUpdater
                 restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
             }
 
-            var restRequest = new RestRequest("/flows", Method.POST);
+            var restRequest = new RestRequest("/flows", Method.Post);
 
             //restRequest.AddFile("filename", fileName);
             restRequest.AddParameter("application/json", file, ParameterType.RequestBody);
             //restRequest.AddParameter("content-type", "application/json");
-            IRestResponse response = restClient.Execute(restRequest);
+            RestResponse response = restClient.Execute(restRequest);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {

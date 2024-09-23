@@ -1,9 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquateknikkUpdater", "AquateknikkUpdater.csproj", "{301885F0-0BA8-45BB-8076-17E36064B041}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AquateknikkUpdater", "AquateknikkUpdater.csproj", "{301885F0-0BA8-45BB-8076-17E36064B041}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuiEditor", "..\GuiEditor\GuiEditor.csproj", "{34D25D55-9C5E-405B-82D5-51C7C2D3573E}"
 EndProject
