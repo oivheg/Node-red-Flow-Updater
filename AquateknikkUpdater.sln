@@ -1,15 +1,8 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AquateknikkUpdater", "AquateknikkUpdater.csproj", "{301885F0-0BA8-45BB-8076-17E36064B041}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuiEditor", "..\GuiEditor\GuiEditor.csproj", "{34D25D55-9C5E-405B-82D5-51C7C2D3573E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeederBurner", "..\FeederBurner\FeederBurner.csproj", "{DBE4E435-6420-43C2-9770-64B09A601E2D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AqAutobackup", "..\AqAutobackup\AqAutobackup.csproj", "{369DE93E-42CF-43BD-89A3-393036F4A78F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +14,6 @@ Global
 		{301885F0-0BA8-45BB-8076-17E36064B041}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{301885F0-0BA8-45BB-8076-17E36064B041}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{301885F0-0BA8-45BB-8076-17E36064B041}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34D25D55-9C5E-405B-82D5-51C7C2D3573E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34D25D55-9C5E-405B-82D5-51C7C2D3573E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34D25D55-9C5E-405B-82D5-51C7C2D3573E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34D25D55-9C5E-405B-82D5-51C7C2D3573E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DBE4E435-6420-43C2-9770-64B09A601E2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DBE4E435-6420-43C2-9770-64B09A601E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DBE4E435-6420-43C2-9770-64B09A601E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DBE4E435-6420-43C2-9770-64B09A601E2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{369DE93E-42CF-43BD-89A3-393036F4A78F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{369DE93E-42CF-43BD-89A3-393036F4A78F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{369DE93E-42CF-43BD-89A3-393036F4A78F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{369DE93E-42CF-43BD-89A3-393036F4A78F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,118 +1,102 @@
 ﻿using RestSharp;
 using System;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 
 namespace AquateknikkUpdater
 {
     internal class RestSharp
     {
-
-        public string CheckConnection(string ipAdress, string port)
+        private static HttpClient InitializeClient(string ipAddress, string port)
         {
+            var client = new HttpClient
+            {
+                BaseAddress = new Uri($"http://{ipAddress}:{port}")
+            };
+            return client;
+        }
 
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
-            //restClient.Timeout = 100;
-            var restRequest = new RestRequest("/auth/login", Method.Get);
-
-            RestResponse response = restClient.Execute(restRequest);
+        public async Task<string> CheckConnectionAsync(string ipAddress, string port)
+        {
+            using var client = InitializeClient(ipAddress, port);
+            var response = await client.GetAsync("/auth/login");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Console.WriteLine("Access Token cannot obtain, process terminate");
-                return "-1";
+                throw new HttpRequestException("Failed to connect");
             }
 
-            dynamic redresult = JsonSerializer.Deserialize<dynamic>(response.Content);
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<JsonElement>(content);
 
-            if ((redresult.ValueKind == JsonValueKind.Object))
-            {
-                return "2";
-            }
-            
-            return "1";
+            return result.ValueKind == JsonValueKind.Object ? "2" : "1";
         }
-        public Token Authenticate(string ipAdress, string port, string user, string pass)
+
+        public async Task<Token> AuthenticateAsync(string ipAddress, string port, string user, string pass)
         {
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
+            using var client = InitializeClient(ipAddress, port);
+            var requestContent = new StringContent(
+                $"client_id=node-red-editor&grant_type=password&scope=*&username={user}&password={pass}",
+                Encoding.UTF8,
+                "application/x-www-form-urlencoded");
 
-            var restRequest = new RestRequest("/auth/token", Method.Post);
-
-            //restRequest.AddXmlBody("client_id", "node-red-editor");
-            //restRequest.AddXmlBody("grant_type", "password");
-            //restRequest.AddXmlBody("scope", "*");
-            //restRequest.AddXmlBody("username", "admin");
-            //restRequest.AddXmlBody("password", "kalinka17");
-            //restRequest.AddHeader("content-type", "application/x-www-form-urlencoded");
-
-            restRequest.AddParameter("application/x-www-form-urlencoded", $"client_id=node-red-editor&grant_type=password" + $"&scope=*" + $"&username=" + user + "" + $"&password=" + pass + "", ParameterType.RequestBody);
-
-            //var response = restClient.Post(restRequest);
-
-            RestResponse response = restClient.Execute(restRequest);
+            var response = await client.PostAsync("/auth/token", requestContent);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Console.WriteLine("Access Token cannot obtain, process terminate");
-                return null;
+                throw new HttpRequestException("Failed to authenticate");
             }
-            Console.WriteLine("Access Token  obtained");
-            var tokenResponse = (response.Content);
 
-            var Token = JsonSerializer.Deserialize<Token>(tokenResponse);
-            return Token;
+            Console.WriteLine("Access Token obtained");
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<Token>(content);
         }
 
-        public string Get_Flows(string token, string ipAdress, string port)
+        public async Task<string> GetFlowsAsync(string token, string ipAddress, string port)
         {
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
-
-            if (token != null)
+            using var client = InitializeClient(ipAddress, port);
+            if (!string.IsNullOrEmpty(token))
             {
-                restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
-            var restRequest = new RestRequest("/flows", Method.Get);
-
-            RestResponse response = restClient.Execute(restRequest);
+            var response = await client.GetAsync("/flows");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Console.WriteLine("Flow not found");
-                return null;
+                throw new HttpRequestException("Failed to get flows");
             }
-            Console.WriteLine("Flow  found");
-            var Flow = (response.Content);
 
-            return Flow;
+            Console.WriteLine("Flow found");
+            return await response.Content.ReadAsStringAsync();
         }
 
-        public void Send_Flow(string file, string token, string ipAdress, string port)
+        public async Task SendFlowAsync(string file, string token, string ipAddress, string port)
         {
-            var restClient = new RestClient("http://" + ipAdress + ":" + port + "");
-
-            if ( !string.IsNullOrEmpty(token) )
+            using var client = InitializeClient(ipAddress, port);
+            if (!string.IsNullOrEmpty(token))
             {
-                restClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
-            var restRequest = new RestRequest("/flows", Method.Post);
-
-            //restRequest.AddFile("filename", fileName);
-            restRequest.AddParameter("application/json", file, ParameterType.RequestBody);
-            //restRequest.AddParameter("content-type", "application/json");
-            RestResponse response = restClient.Execute(restRequest);
+            var requestContent = new StringContent(file, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/flows", requestContent);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                Console.WriteLine("File not Sendt ");
+                Console.WriteLine("File not sent");
+                throw new HttpRequestException("Failed to send flow");
             }
-            else
-            {
-Console.WriteLine("File  Sendt ");
-            }
-            
+
+            Console.WriteLine("File sent");
         }
     }
 }
