@@ -1,7 +1,6 @@
 ﻿using Renci.SshNet;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AquateknikkUpdater
@@ -18,8 +17,7 @@ namespace AquateknikkUpdater
         private int StartAut = 1;
         private int StopAut = 1;
         private string Filepath = "";
-        private string fileLocation = "";
-
+      private string  fileLocation = "";
         public Form1()
         {
             InitializeComponent();
@@ -33,27 +31,28 @@ namespace AquateknikkUpdater
             #endregion debugging
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
             // check if there is connection and if username works
 
             GetInfo();
-            var login = await api.CheckConnectionAsync(IPadress, Port);
+            var Login = api.CheckConnection(IPadress, Port);
+            // Token = api.Authenticate(IPadress, Port, User, Pass);
 
-            if (login == "1")
+            if (Login == "1")
             {
                 messageBox("Login is required", "login");
             }
-            else if (login == "2")
+            else if (Login == "2")
             {
                 messageBox("No Login required", "NO login");
                 chckNoUser.Checked = true;
                 txtuser.Enabled = false;
                 txtpass.Enabled = false;
             }
-            else
+            else if (Login == "-1")
             {
-                messageBox("Check IP", "No Connection");
+                messageBox("Check IP", "No Conenction");
             }
         }
 
@@ -62,10 +61,10 @@ namespace AquateknikkUpdater
             string message = Message;
             string title = Title;
             MessageBoxButtons buttons = MessageBoxButtons.OK;
-            MessageBox.Show(message, title, buttons);
+            DialogResult result = MessageBox.Show(message, title, buttons);
         }
 
-        private async void GetInfo()
+        private void GetInfo()
         {
             IPadress = txtIp.Text;
             Port = txtPort.Text;
@@ -73,25 +72,28 @@ namespace AquateknikkUpdater
             Pass = txtpass.Text;
             HasUser = chckNoUser.Checked;
 
-            Token = await api.AuthenticateAsync(IPadress, Port, User, Pass);
+            int portnumber = int.Parse(Port);
+         
+            Token = api.Authenticate(IPadress, portnumber.ToString(), User, Pass);
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            string flow;
+            var flow = "";
             GetInfo();
-
+         
             if (Token == null)
             {
-                flow = await api.GetFlowsAsync("", IPadress, Port);
+                flow = api.Get_Flows("", IPadress, Port);
             }
             else
             {
-                flow = await api.GetFlowsAsync(Token.access_token, IPadress, Port);
+                flow = api.Get_Flows(Token.access_token, IPadress, Port);
             }
 
-            string savefilelocation = "";
-
+            var savefilelocation = "";
+           
+            //saveFileDialog1.ShowDialog();
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 savefilelocation = saveFileDialog1.FileName;
@@ -102,7 +104,9 @@ namespace AquateknikkUpdater
                 return;
             }
 
-            fileLocation = Path.GetDirectoryName(savefilelocation);
+
+            fileLocation = System.IO.Path.GetDirectoryName(savefilelocation);
+            //fileLocation = Got_Flow(fileLocation, 0, flow);
             File.WriteAllText(savefilelocation, flow);
             lst_log.Items.Add("Current flow is Backed up");
             btnChooseFlow.Enabled = true;
@@ -110,7 +114,7 @@ namespace AquateknikkUpdater
 
         private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var tmp = (OpenFileDialog)sender;
+            var tmp = (System.Windows.Forms.OpenFileDialog)sender;
 
             Filepath = tmp.FileName;
 
@@ -123,17 +127,20 @@ namespace AquateknikkUpdater
 
         private void button3_Click(object sender, EventArgs e)
         {
+
             GetInfo();
             openFileDialog1.ShowDialog();
         }
 
-        private async void button4_Click(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)
+
         {
             GetInfo();
             if (Confirmation())
             {
-                await SendFlowAsync(IPadress);
-                lst_log.Items.Add("File Sent");
+                SendFlow(IPadress);
+
+                lst_log.Items.Add("File Sendt ");
             }
             else
             {
@@ -141,18 +148,20 @@ namespace AquateknikkUpdater
             }
         }
 
-        private async Task SendFlowAsync(string autIp)
+        private void SendFlow(string autIp)
         {
             string file = File.ReadAllText(txtFile.Text);
-            Token = await api.AuthenticateAsync(autIp, Port, User, Pass);
 
+            //JObject json = JObject.Parse(file);
+            int portnumber = int.Parse(Port);
+            Token = api.Authenticate(autIp, portnumber.ToString(), User, Pass);
             if (Token == null)
             {
-                await api.SendFlowAsync(file, "", autIp, Port);
+                api.Send_Flow(file, "", autIp, Port);
             }
             else
             {
-                await api.SendFlowAsync(file, Token.access_token, autIp, Port);
+                api.Send_Flow(file, Token.access_token, autIp, Port);
             }
         }
 
@@ -160,10 +169,14 @@ namespace AquateknikkUpdater
         {
             txtIp.Text = "192.168.100.220";
             txtPort.Text = "1880";
-        }
 
-        private async void btnBackupFolder_Click(object sender, EventArgs e)
+            //btnChooseFlow.Enabled = false;
+        }
+ 
+        private void btnBackupFolder_Click(object sender, EventArgs e)
         {
+          
+            //saveFileDialog1.ShowDialog();
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 fileLocation = folderBrowserDialog1.SelectedPath;
@@ -175,17 +188,17 @@ namespace AquateknikkUpdater
                 for (int i = StartAut - 1; i < StopAut; i++)
                 {
                     int Autnumber = i + 1;
-                    string flow;
-                    int portnumber = int.Parse(Port) + i;
-                    Token = await api.AuthenticateAsync(IPadress, portnumber.ToString(), User, Pass);
-
+                    var flow = "";
+                    int portnumber = int.Parse(Port);
+                    portnumber += i;
+                    Token = api.Authenticate(IPadress, portnumber.ToString(), User, Pass);
                     if (Token != null)
                     {
-                        flow = await api.GetFlowsAsync(Token.access_token, IPadress, Port);
+                        flow = api.Get_Flows(Token.access_token, IPadress, Port);
                     }
                     else
                     {
-                        flow = await api.GetFlowsAsync("", IPadress, Port);
+                        flow = api.Get_Flows("", IPadress, Port);
                     }
 
                     Save_Flows(fileLocation, Autnumber, flow);
@@ -206,19 +219,21 @@ namespace AquateknikkUpdater
                 {
                     txtplant.Text = DateTime.Today.ToShortDateString();
                 }
-                fileLocation += "\\" + txtplant.Text;
-                Directory.CreateDirectory(fileLocation);
+                fileLocation += "\\" + txtplant.Text + "";
+                DirectoryInfo di = Directory.CreateDirectory(fileLocation);
 
                 File.WriteAllText(fileLocation + "/Backup_Aut" + Autnumber + "_" + DateTime.Today.ToShortDateString() + ".json", flow);
                 lst_log.Items.Add("Aut: " + Autnumber + " backed up");
             }
+
+            //return fileLocation;
         }
 
         private int autnr = 50;
 
         private void chckNoUser_CheckedChanged(object sender, EventArgs e)
         {
-            if (chckNoUser.Checked)
+            if (chckNoUser.Checked == true)
             {
                 txtuser.Enabled = false;
                 txtpass.Enabled = false;
@@ -230,7 +245,7 @@ namespace AquateknikkUpdater
             }
         }
 
-        private async void btnUpdateAll_Click(object sender, EventArgs e)
+        private void btnUpdateAll_Click(object sender, EventArgs e)
         {
             StopAut = int.Parse(txtportstop.Text);
             StartAut = int.Parse(txtportstart.Text);
@@ -242,7 +257,9 @@ namespace AquateknikkUpdater
                 for (int i = StartAut - 1; i < StopAut; i++)
                 {
                     var tmpIPadress = IPadress + (autnr + i);
-                    await SendFlowAsync(tmpIPadress);
+                 
+                    SendFlow(tmpIPadress);
+
                     lst_log.Items.Add("---Aut Number " + i + " updated");
                 }
                 lst_log.Items.Add("All updated");
@@ -259,7 +276,16 @@ namespace AquateknikkUpdater
             string title = "Confirm";
             MessageBoxButtons buttons = MessageBoxButtons.YesNo;
             DialogResult result = MessageBox.Show(message, title, buttons);
-            return result == DialogResult.Yes;
+            if (result == DialogResult.Yes)
+            {
+                //this.Close();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void btnsql_Click(object sender, EventArgs e)
@@ -269,9 +295,13 @@ namespace AquateknikkUpdater
 
         private void BackupSql()
         {
-            string host = IPadress;
+            string host = @"" + IPadress;
+            //string host = @"192.168.250.5";
+            //string username = "pi";
+            //string password = "kalinka17";
             string username = "pi";
             string password = "kalinka17";
+            string localFileName = System.IO.Path.GetFileName(@"localfilename");
             string remoteDirectory = "/home/pi/";
 
             using (var sshclient = new SshClient(host, username, password))
@@ -281,14 +311,18 @@ namespace AquateknikkUpdater
                 sc1.Execute();
                 SshCommand sc2 = sshclient.CreateCommand(password);
                 sc2.Execute();
+                string sshanswere = sc1.Result;
+                string loginanswere = sc2.Result;
 
                 SshCommand sc = sshclient.CreateCommand("mysqldump -u root -pkalinka17 fishfarm > fishfarmbackup.sql");
                 sc.Execute();
+                string answer = sc.Result;
             }
 
             using (var sftp = new SftpClient(host, username, password))
             {
                 sftp.Connect();
+                var files = sftp.ListDirectory(remoteDirectory);
                 using (Stream fileStream = File.Create(fileLocation + "\\" + txtplant.Text + "DB.sql"))
                 {
                     sftp.DownloadFile("/home/pi/fishfarmbackup.sql", fileStream);
