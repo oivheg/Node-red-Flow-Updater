@@ -12,7 +12,7 @@
 
         public static void GetToken()
         {
-            var restApi = new RestSharp();
+            var restApi = new ApiClient();
         }
     }
 }
